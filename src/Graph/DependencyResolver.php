@@ -3,6 +3,7 @@
 namespace Splicewire\Sync\Graph;
 
 use Illuminate\Support\Facades\Log;
+use Rushing\Graphine\Algorithms\TopologicalSort;
 use Splicewire\Sync\Contracts\Syncable;
 
 /**
@@ -15,7 +16,10 @@ use Splicewire\Sync\Contracts\Syncable;
  * the caller wraps it in whatever context switching its topology needs.
  *
  * Behaviour-preserving: this is the exact logic previously inlined on TenantSyncEngine (expandScope /
- * topologicalSort / kahnSort), moved without change.
+ * topologicalSort / kahnSort). The Kahn kernel is no longer hand-rolled here — the ordering step
+ * delegates to the shared, driver-agnostic {@see TopologicalSort} kernel;
+ * this class keeps only the Syncable-specific concerns: the syncDependencies() walk and the
+ * degrade-on-cycle policy (warn, then append the cyclic remainder rather than throw).
  */
 class DependencyResolver
 {
@@ -78,14 +82,12 @@ class DependencyResolver
      */
     public function topologicalSort(array $entitySet): array
     {
-        $deps = [];
         $allNodes = [];
+        $adjacency = [];
 
         foreach ($entitySet as $class => $ids) {
             foreach ($ids as $id) {
-                $key = "{$class}::{$id}";
-                $allNodes[$key] = [$class, $id];
-                $deps[$key] = [];
+                $allNodes["{$class}::{$id}"] = [$class, $id];
             }
         }
 
@@ -101,61 +103,25 @@ class DependencyResolver
                     foreach ($depIds as $depId) {
                         $depKey = "{$depClass}::{$depId}";
                         if (isset($allNodes[$depKey])) {
-                            $deps[$key][] = $depKey;
+                            // A prerequisite precedes its dependent: in the kernel's
+                            // successor convention that is the directed edge dep → key.
+                            $adjacency[$depKey][] = $key;
                         }
                     }
                 }
             }
         }
 
-        return $this->kahnSort($allNodes, $deps);
-    }
+        $order = TopologicalSort::kahn(array_keys($allNodes), $adjacency);
 
-    /**
-     * Kahn's algorithm for topological sort.
-     *
-     * @param  array<string, array{0: class-string, 1: string}>  $nodes
-     * @param  array<string, list<string>>  $deps  node => deps it depends on
-     * @return list<array{0: class-string, 1: string}>
-     */
-    private function kahnSort(array $nodes, array $deps): array
-    {
-        $inDegree = array_fill_keys(array_keys($nodes), 0);
-        $dependents = array_fill_keys(array_keys($nodes), []);
+        $sorted = array_map(static fn (string $key) => $allNodes[$key], $order->sorted);
 
-        foreach ($deps as $node => $nodeDeps) {
-            foreach ($nodeDeps as $dep) {
-                $inDegree[$node]++;
-                $dependents[$dep][] = $node;
-            }
-        }
-
-        $queue = [];
-        foreach ($inDegree as $node => $degree) {
-            if ($degree === 0) {
-                $queue[] = $node;
-            }
-        }
-
-        $sorted = [];
-        while (! empty($queue)) {
-            $node = array_shift($queue);
-            $sorted[] = $nodes[$node];
-
-            foreach ($dependents[$node] as $dependent) {
-                $inDegree[$dependent]--;
-                if ($inDegree[$dependent] === 0) {
-                    $queue[] = $dependent;
-                }
-            }
-        }
-
-        if (count($sorted) < count($nodes)) {
+        // Degrade, don't throw: a dependency cycle leaves nodes unordered. Warn and
+        // append the cyclic remainder so the caller still gets every entity.
+        if ($order->hasCycle()) {
             Log::warning('DependencyResolver: dependency cycle detected; some entities may be written out of order.');
-            foreach ($nodes as $key => $node) {
-                if ($inDegree[$key] > 0) {
-                    $sorted[] = $node;
-                }
+            foreach ($order->cyclic as $key) {
+                $sorted[] = $allNodes[$key];
             }
         }
 
