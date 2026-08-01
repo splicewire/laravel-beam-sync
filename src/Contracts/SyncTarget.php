@@ -6,7 +6,7 @@ namespace Splicewire\Sync\Contracts;
  * The write seam the sync engine drives THROUGH. A target owns "has this source entity already
  * landed at this version?" (lineage/hash diff) and "apply one payload, record lineage, return the
  * landed id". The tenancy push-to-tenant-schema logic is one implementation
- * (Splicewire\Tenancy\Sync\TenantSyncTarget, in laravel-tower-tenancy); a remote/CLI/export target
+ * (Splicewire\Tower\Tenancy\Sync\TenantSyncTarget, in laravel-tower-tenancy); a remote/CLI/export target
  * is another. NOTE: no `use` on that class — this foundation never imports up into tower.
  *
  * Because {@see apply()} takes a bare `array $payload` (not a model), a remote payload applies

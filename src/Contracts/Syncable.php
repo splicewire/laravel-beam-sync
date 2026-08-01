@@ -8,7 +8,7 @@ namespace Splicewire\Sync\Contracts;
  * ZERO tenancy in the contract. This is the only piece a syncable model needs to implement.
  *
  * Extracted DOWN into splicewire/laravel-beam-sync (issue 17 P1). The old FQCN
- * `Splicewire\Tenancy\Sync\Syncable` remains a back-compat class_alias for one release.
+ * `Splicewire\Tower\Tenancy\Sync\Syncable` remains a back-compat class_alias for one release.
  */
 interface Syncable
 {
