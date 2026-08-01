@@ -1,0 +1,63 @@
+{
+    "name": "splicewire/laravel-beam-sync",
+    "description": "Generic sync foundation: the Syncable contract, the byte-stable SyncData transit base, a tenancy-blind dependency resolver (scope-expand + Kahn topo-sort), and the SyncSource/SyncTarget ports. Copies a dependency cone BY VALUE across shared-nothing boundaries — usable off a local tenant context AND from remote sources. NOT built on stancl/tenancy's resource-syncing (a different, single-row-mirror mechanism); requires no beam, tenancy, or tower.",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Stephen Rushing",
+            "email": "stephen@rushing.dev"
+        }
+    ],
+    "require": {
+        "php": "^8.3",
+        "illuminate/contracts": "^11.0|^12.0|^13.0",
+        "illuminate/support": "^11.0|^12.0|^13.0",
+        "spatie/laravel-data": "^4.0|^5.0"
+    },
+    "require-dev": {
+        "orchestra/testbench": "^9.0|^10.0|^11.0",
+        "pestphp/pest": "^2.0|^3.0",
+        "laravel/pint": "^1.0"
+    },
+    "suggest": {
+        "splicewire/laravel-beam": "Ride the Particle read/write/hydrate pipeline for sync-in/sync-out (the beam-sync-beam bridge)."
+    },
+    "autoload": {
+        "psr-4": {
+            "Splicewire\\Sync\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Splicewire\\Sync\\Tests\\": "tests/"
+        }
+    },
+    "scripts": {
+        "test": "vendor/bin/pest",
+        "pint": "vendor/bin/pint"
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-main": "1.0.x-dev"
+        },
+        "package-topology": {
+            "because": "beam-sync is a foundation both a beam package (taxonomy) and the tenancy target depend DOWN on; it must never reach UP into either.",
+            "policy": {
+                "noRequire": [
+                    { "fromPrefix": "splicewire/laravel-beam-sync", "toPrefix": "splicewire/laravel-beam", "because": "sync is useful without beam and from remote sources; the base never requires beam (the Particle bridge is a separate optional package)" },
+                    { "fromPrefix": "splicewire/laravel-beam-sync", "toPrefix": "splicewire/laravel-tower", "because": "sync is useful without tenancy; the base never requires tower/tenancy" },
+                    { "fromPrefix": "splicewire/laravel-beam-sync", "toPrefix": "splicewire/laravel-satellite", "because": "the foundation never reaches up into the consumer-app tier" },
+                    { "fromPrefix": "splicewire/laravel-beam-sync", "toPrefix": "stancl/", "because": "tower Sync is independent of stancl's resource-syncing (single-row mirror); beam-sync must not inherit that mechanism" }
+                ]
+            }
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "config": {
+        "allow-plugins": {
+            "pestphp/pest-plugin": true
+        }
+    }
+}
