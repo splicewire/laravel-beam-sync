@@ -30,4 +30,15 @@ use Splicewire\Sync\Contracts\Syncable;
  * SyncData classes are **backend-only**: they carry no `#[TypeScript]`/`#[AdminResource]`
  * attribute, so an app's attributed-class transformer never leaks them into the UI type manifest.
  */
-abstract class SyncData extends Data {}
+abstract class SyncData extends Data
+{
+    /**
+     * The optional protocol key carrying the SOURCE record's canonical schema `$id`
+     * (relative `<name>/<version>` form, e.g. `taxonomy/tag/1`) so a schema-driven
+     * target can reconcile-on-apply — migrate the incoming payload against the current
+     * schema before it persists. Purely additive: a payload that omits it (every
+     * pre-existing wire shape) reconciles as a total no-op. NEVER folded into `_hash`,
+     * so adding it does not shift lineage diffing.
+     */
+    public const SCHEMA_KEY = '_schema';
+}
