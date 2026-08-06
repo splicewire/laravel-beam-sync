@@ -27,7 +27,7 @@ use Splicewire\Sync\Contracts\Syncable;
  * the hand-built arrays emitted before this refactor (guarded by the byte-stability test at
  * the consuming app's `tests/Feature/Sync/SyncPayloadByteStabilityTest.php`).
  *
- * SyncData classes are **backend-only**: they carry no `#[TypeScript]`/`#[AdminResource]`
+ * SyncData classes are **backend-only**: they carry no `#[TypeScript]`/`#[ParticleResource]`
  * attribute, so an app's attributed-class transformer never leaks them into the UI type manifest.
  */
 abstract class SyncData extends Data
