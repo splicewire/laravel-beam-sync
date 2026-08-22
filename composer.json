@@ -17,9 +17,10 @@
         "spatie/laravel-data": "^4.0|^5.0"
     },
     "require-dev": {
+        "laravel/pint": "^1.0",
         "orchestra/testbench": "^9.0|^10.0|^11.0",
         "pestphp/pest": "^2.0|^3.0",
-        "laravel/pint": "^1.0"
+        "wikimedia/composer-merge-plugin": "^2.1"
     },
     "suggest": {
         "splicewire/laravel-beam": "Ride the Particle read/write/hydrate pipeline for sync-in/sync-out (the beam-sync-beam bridge)."
@@ -46,28 +47,47 @@
             "because": "beam-sync is a foundation both a beam package (taxonomy) and the tenancy target depend DOWN on; it must never reach UP into either.",
             "policy": {
                 "noRequire": [
-                    { "fromPrefix": "splicewire/laravel-beam-sync", "toPrefix": "splicewire/laravel-beam", "because": "sync is useful without beam and from remote sources; the base never requires beam (the Particle bridge is a separate optional package)" },
-                    { "fromPrefix": "splicewire/laravel-beam-sync", "toPrefix": "splicewire/laravel-tower", "because": "sync is useful without tenancy; the base never requires tower/tenancy" },
-                    { "fromPrefix": "splicewire/laravel-beam-sync", "toPrefix": "splicewire/laravel-satellite", "because": "the foundation never reaches up into the consumer-app tier" },
-                    { "fromPrefix": "splicewire/laravel-beam-sync", "toPrefix": "stancl/", "because": "tower Sync is independent of stancl's resource-syncing (single-row mirror); beam-sync must not inherit that mechanism" }
+                    {
+                        "fromPrefix": "splicewire/laravel-beam-sync",
+                        "toPrefix": "splicewire/laravel-beam",
+                        "because": "sync is useful without beam and from remote sources; the base never requires beam (the Particle bridge is a separate optional package)"
+                    },
+                    {
+                        "fromPrefix": "splicewire/laravel-beam-sync",
+                        "toPrefix": "splicewire/laravel-tower",
+                        "because": "sync is useful without tenancy; the base never requires tower/tenancy"
+                    },
+                    {
+                        "fromPrefix": "splicewire/laravel-beam-sync",
+                        "toPrefix": "splicewire/laravel-satellite",
+                        "because": "the foundation never reaches up into the consumer-app tier"
+                    },
+                    {
+                        "fromPrefix": "splicewire/laravel-beam-sync",
+                        "toPrefix": "stancl/",
+                        "because": "tower Sync is independent of stancl's resource-syncing (single-row mirror); beam-sync must not inherit that mechanism"
+                    }
                 ]
             }
+        },
+        "merge-plugin": {
+            "include": [
+                "composer.local.json"
+            ]
         }
     },
     "repositories": [
         {
-            "type": "path",
-            "url": "../../rushing/laravel-graphine",
-            "options": {
-                "symlink": true
-            }
+            "type": "git",
+            "url": "https://github.com/stephenr85/laravel-graphine.git"
         }
     ],
     "minimum-stability": "dev",
     "prefer-stable": true,
     "config": {
         "allow-plugins": {
-            "pestphp/pest-plugin": true
+            "pestphp/pest-plugin": true,
+            "wikimedia/composer-merge-plugin": true
         }
     }
 }
