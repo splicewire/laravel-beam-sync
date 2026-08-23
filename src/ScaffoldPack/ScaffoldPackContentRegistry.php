@@ -2,6 +2,10 @@
 
 namespace Splicewire\Sync\ScaffoldPack;
 
+use Rushing\Popcorn\Registries\IsRegistry;
+use Rushing\Popcorn\Registries\OnDuplicate;
+use Rushing\Popcorn\Registries\RegistryArity;
+
 use InvalidArgumentException;
 use Splicewire\Sync\Graph\DependencyResolver;
 
@@ -24,6 +28,17 @@ use Splicewire\Sync\Graph\DependencyResolver;
  * whatever read context (tenant schema, remote feed) it already runs in — same discipline as
  * {@see DependencyResolver}.
  */
+#[IsRegistry(
+    root: 'beam.sync.scaffold-pack.content-kinds',
+    of: 'the content-kinds a Scaffold Pack may deliver, each with a federation_kind (copy/pointer/shadow)',
+    arity: RegistryArity::RunAll,
+    onDuplicate: OnDuplicate::Supersede,
+    note: 'Declared HERE, on the owning class, though `splicewire/tower` is what described it into the old '
+        .'index — a describe-on-behalf that registry-kernel ticket 08 made unwritable. Moving the '
+        .'describe() CALL into this package\'s own provider is ticket 22\'s; the declaration has only ever '
+        .'had one legal home.',
+    order: 70,
+)]
 class ScaffoldPackContentRegistry
 {
     /** @var array<string, ContentKindRegistration> */

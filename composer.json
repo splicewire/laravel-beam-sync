@@ -1,6 +1,6 @@
 {
     "name": "splicewire/laravel-beam-sync",
-    "description": "Generic sync foundation: the Syncable contract, the byte-stable SyncData transit base, a tenancy-blind dependency resolver (scope-expand + Kahn topo-sort), and the SyncSource/SyncTarget ports. Copies a dependency cone BY VALUE across shared-nothing boundaries — usable off a local tenant context AND from remote sources. NOT built on stancl/tenancy's resource-syncing (a different, single-row-mirror mechanism); requires no beam, tenancy, or tower.",
+    "description": "Generic sync foundation: the Syncable contract, the byte-stable SyncData transit base, a tenancy-blind dependency resolver (scope-expand + Kahn topo-sort), and the SyncSource/SyncTarget ports. Copies a dependency cone BY VALUE across shared-nothing boundaries \u2014 usable off a local tenant context AND from remote sources. NOT built on stancl/tenancy's resource-syncing (a different, single-row-mirror mechanism); requires no beam, tenancy, or tower.",
     "type": "library",
     "license": "MIT",
     "authors": [
@@ -14,7 +14,8 @@
         "illuminate/contracts": "^11.0|^12.0|^13.0",
         "illuminate/support": "^11.0|^12.0|^13.0",
         "rushing/laravel-graphine": "dev-main",
-        "spatie/laravel-data": "^4.0|^5.0"
+        "spatie/laravel-data": "^4.0|^5.0",
+        "rushing/php-popcorn": "dev-main"
     },
     "require-dev": {
         "laravel/pint": "^1.0",
@@ -80,6 +81,10 @@
         {
             "type": "git",
             "url": "https://github.com/stephenr85/laravel-graphine.git"
+        },
+        {
+            "type": "git",
+            "url": "https://github.com/stephenr85/php-popcorn.git"
         }
     ],
     "minimum-stability": "dev",
