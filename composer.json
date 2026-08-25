@@ -85,6 +85,14 @@
         {
             "type": "git",
             "url": "https://github.com/stephenr85/php-popcorn.git"
+        },
+        {
+            "type": "git",
+            "url": "https://github.com/stephenr85/php-graphine.git"
+        },
+        {
+            "type": "git",
+            "url": "https://github.com/stephenr85/laravel-popcorn.git"
         }
     ],
     "minimum-stability": "dev",
