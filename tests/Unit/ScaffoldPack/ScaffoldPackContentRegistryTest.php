@@ -98,9 +98,11 @@ it('answers false rather than throwing for a key outside the key grammar', funct
     expect((new ScaffoldPackContentRegistry)->has('Not A Key@2'))->toBeFalse();
 });
 
-it('keeps RunAll registration order, and a re-registration supersedes AND appends', function () {
-    // ⚠️ RunAll makes order load-bearing: Tower walks `copyable()` to build the wholesale-copy
-    // scope. A PHP array assignment held the original slot; superseding MOVES the entry to the end.
+it('keeps RunAll registration order, and a re-registration supersedes IN PLACE', function () {
+    // ⚠️ RunAll makes order load-bearing: Tower walks `copyable()` to build the wholesale-copy scope.
+    // A PHP array assignment held the original slot, and registry-kernel 62 made supersession hold it
+    // too — this test used to assert the opposite, which is precisely the silent re-sort 62 removed:
+    // a host overriding one shipped content kind would have re-ordered the whole copy scope with it.
     $registry = new ScaffoldPackContentRegistry;
     $registry->register('author', FakeAuthor::class, FederationKind::Copy);
     $registry->register('book', FakeBook::class, FederationKind::Copy);
@@ -110,7 +112,7 @@ it('keeps RunAll registration order, and a re-registration supersedes AND append
 
     $registry->register('author', FakeBook::class, FederationKind::Copy);
 
-    expect($registry->kinds())->toBe(['book', 'author'])
+    expect($registry->kinds())->toBe(['author', 'book'])
         ->and($registry->get('author')->modelClass)->toBe(FakeBook::class)
-        ->and(array_column($registry->describe(), 'key'))->toBe(['book', 'author']);
+        ->and(array_column($registry->describe(), 'key'))->toBe(['author', 'book']);
 });
