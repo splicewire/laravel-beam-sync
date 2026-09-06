@@ -11,7 +11,6 @@ use Rushing\Popcorn\Registries\IsRegistry;
 use Rushing\Popcorn\Registries\Key;
 use Rushing\Popcorn\Registries\OnDuplicate;
 use Rushing\Popcorn\Registries\Registry;
-use Rushing\Popcorn\Registries\RegistryArity;
 use Rushing\Popcorn\Registries\RegistryKey;
 use Splicewire\Sync\Graph\DependencyResolver;
 
@@ -37,7 +36,7 @@ use Splicewire\Sync\Graph\DependencyResolver;
  * ## On the popcorn kernel (registry-kernel ticket 38)
  *
  * The `[key => ContentKindRegistration]` array is a {@see BasicRegistry} held as a field, so
- * registration order — which this registry's `RunAll` arity makes load-bearing, since Tower walks
+ * registration order — observable because Tower walks
  * `copyable()` to build a wholesale-copy scope — is the kernel's documented guarantee rather than
  * a PHP array's implicit one.
  *
@@ -59,14 +58,9 @@ use Splicewire\Sync\Graph\DependencyResolver;
  */
 #[IsRegistry(
     root: 'beam.sync.scaffold-pack.content-kinds',
-    of: 'the content-kinds a Scaffold Pack may deliver, each with a federation_kind (copy/pointer/shadow)',
-    arity: RegistryArity::RunAll,
     entryType: ContentKindRegistration::class,
     onDuplicate: OnDuplicate::Supersede,
-    note: 'Declared HERE, on the owning class, though `splicewire/tower` is what binds, fills and '
-        .'describes it — beam-sync ships no service provider of its own. Moving the binding and the '
-        .'describe() CALL into this package is registry-kernel ticket 22\'s; the declaration has only '
-        .'ever had one legal home.',
+    description: 'the content-kinds a Scaffold Pack may deliver, each with a federation_kind (copy/pointer/shadow). Declared HERE, on the owning class, though `splicewire/tower` is what binds, fills and describes it — beam-sync ships no service provider of its own. Moving the binding and the describe() CALL into this package is registry-kernel ticket 22\'s; the declaration has only ever had one legal home.',
     order: 70,
 )]
 class ScaffoldPackContentRegistry implements Gated, Registry
