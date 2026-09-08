@@ -9,7 +9,7 @@ use Rushing\Popcorn\Registries\BasicRegistry;
 use Rushing\Popcorn\Registries\Gated;
 use Rushing\Popcorn\Registries\IsRegistry;
 use Rushing\Popcorn\Registries\Key;
-use Rushing\Popcorn\Registries\OnDuplicate;
+use Rushing\Popcorn\Registries\OnKeyDuplicate;
 use Rushing\Popcorn\Registries\Registry;
 use Rushing\Popcorn\Registries\RegistryKey;
 use Splicewire\Sync\Graph\DependencyResolver;
@@ -59,7 +59,7 @@ use Splicewire\Sync\Graph\DependencyResolver;
 #[IsRegistry(
     root: 'beam.sync.scaffold-pack.content-kinds',
     entryType: ContentKindRegistration::class,
-    onDuplicate: OnDuplicate::Supersede,
+    onKeyDuplicate: OnKeyDuplicate::Supersede,
     description: 'the content-kinds a Scaffold Pack may deliver, each with a federation_kind (copy/pointer/shadow). Declared HERE, on the owning class, though `splicewire/tower` is what binds, fills and describes it — beam-sync ships no service provider of its own. Moving the binding and the describe() CALL into this package is registry-kernel ticket 22\'s; the declaration has only ever had one legal home.',
     order: 70,
 )]
