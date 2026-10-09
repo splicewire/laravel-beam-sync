@@ -19,13 +19,14 @@ use Splicewire\Sync\Contracts\Syncable;
  *    {@see Syncable::fromSyncPayload()} resolves through lineage;
  *  - carries copyable transit-only relations (verbatim embedding vectors, RDF triples, silo
  *    pivots, media sidecar) that no API DTO would model; and
- *  - carries protocol fields (`_hash`, `_media_*`).
+ *  - carries transit fields (`hash`, `mediaDisk`, `mediaPath`, …) in the estate's camelCase wire
+ *    vocabulary.
  *
  * It is a *typed intermediate*, not a new transport: `Syncable::toSyncPayload()` still returns a
  * bare `array` (`$this->toSyncData()->toArray()`) and the engine, hashing, and phased transit are
- * unchanged. Serialized keys are pinned with `#[MapName]` so the wire bytes are byte-for-byte what
- * the hand-built arrays emitted before this refactor (guarded by the byte-stability test at
- * the consuming app's `tests/Feature/Sync/SyncPayloadByteStabilityTest.php`).
+ * unchanged. Data properties use the published camelCase spelling directly; database columns remain
+ * snake_case behind each model's import/export seam. The consuming app guards the exact projection in
+ * `tests/Feature/Sync/SyncPayloadByteStabilityTest.php`.
  *
  * SyncData classes are **backend-only**: they carry no `#[TypeScript]`/`#[ParticleResource]`
  * attribute, so an app's attributed-class transformer never leaks them into the UI type manifest.
@@ -37,8 +38,8 @@ abstract class SyncData extends Data
      * (relative `<name>/<version>` form, e.g. `taxonomy/tag/1`) so a schema-driven
      * target can reconcile-on-apply — migrate the incoming payload against the current
      * schema before it persists. Purely additive: a payload that omits it (every
-     * pre-existing wire shape) reconciles as a total no-op. NEVER folded into `_hash`,
+     * pre-existing wire shape) reconciles as a total no-op. NEVER folded into `hash`,
      * so adding it does not shift lineage diffing.
      */
-    public const SCHEMA_KEY = '_schema';
+    public const SCHEMA_KEY = 'schemaId';
 }

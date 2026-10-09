@@ -28,8 +28,8 @@ use Splicewire\Sync\Transit\SyncData;
  *
  * Neither needs a fixture payload, which is what lets it be data-driven. Abstract bases are
  * INCLUDED deliberately: `SyncData` is abstract and is presently this package's entire
- * laravel-data surface, and its `#[MapName]`-pinned wire bytes are exactly what an unanalysable
- * base would silently take down.
+ * laravel-data surface, and its camelCase wire contract is exactly what an unanalysable base would
+ * silently take down.
  */
 function beamSyncDataClasses(): array
 {
@@ -67,6 +67,10 @@ function beamSyncDataClasses(): array
 
     return $classes;
 }
+
+it('names the optional schema identity in the camel transit vocabulary', function (): void {
+    expect(SyncData::SCHEMA_KEY)->toBe('schemaId');
+});
 
 it('has the laravel-data provider booted, mirroring the host config', function () {
     // Guards the fix itself. Without the provider `config('data')` is null and every case below
