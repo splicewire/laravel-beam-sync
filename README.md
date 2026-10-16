@@ -17,9 +17,11 @@ boundaries — tenant schema → tenant schema, or a remote feed → a local sto
 ## Tier
 
 A **foundation** sibling of `laravel-beam`, on the same rung as `rushing/laravel-versioning` and
-`schemastud/laravel-data-schemas`. Requires only `illuminate/contracts` + `illuminate/support` +
-`spatie/laravel-data`. **No beam, no tenancy, no tower, no stancl.** Both `laravel-beam-taxonomy`
-and `laravel-tower-tenancy` depend DOWN on it.
+`schemastud/laravel-data-schemas`. Requires `illuminate/contracts` + `illuminate/support` +
+`spatie/laravel-data` + `rushing/laravel-graphine` + `rushing/php-popcorn` (the graph edge is
+queued to narrow to `php-graphine` alone — graph-review/A3 nomination). **No
+beam, no tenancy, no tower, no stancl.** `laravel-beam-taxonomy` and tower's tenancy arm (the
+dissolved `laravel-tower-tenancy`, ADR-0162) depend DOWN on it.
 
 ## NOT stancl resource-syncing
 
