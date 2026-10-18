@@ -18,8 +18,9 @@ boundaries — tenant schema → tenant schema, or a remote feed → a local sto
 
 A **foundation** sibling of `laravel-beam`, on the same rung as `rushing/laravel-versioning` and
 `schemastud/laravel-data-schemas`. Requires `illuminate/contracts` + `illuminate/support` +
-`spatie/laravel-data` + `rushing/laravel-graphine` + `rushing/php-popcorn` (the graph edge is
-queued to narrow to `php-graphine` alone — graph-review/A3 nomination). **No
+`spatie/laravel-data` + `rushing/php-graphine` + `rushing/php-popcorn` (the graph edge narrowed
+from `laravel-graphine` 2026-10-18 — graph-review/A3; the one symbol used is
+`Rushing\Graphine\Algorithms\TopologicalSort`, which lives in the framework-free package). **No
 beam, no tenancy, no tower, no stancl.** `laravel-beam-taxonomy` and tower's tenancy arm (the
 dissolved `laravel-tower-tenancy`, ADR-0162) depend DOWN on it.
 
