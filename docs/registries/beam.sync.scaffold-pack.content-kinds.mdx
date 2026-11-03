@@ -1,0 +1,84 @@
+---
+title: Scaffold Pack content kinds
+segment: beam.sync.scaffold-pack.content-kinds
+nav_order: 70
+excerpt: Every kind of content a Scaffold Pack can deliver to a new tenant, and whether it is copied or referenced.
+---
+
+# Scaffold Pack content kinds
+
+`beam.sync.scaffold-pack.content-kinds` lists every **content kind** a Scaffold Pack can deliver to a
+tenant, such as schemas, circuits, agents or a hosted site's published pages. Each entry is a
+`ContentKindRegistration` that names the model, says how the content reaches the target tenant, and
+optionally scopes which rows count. Entries are keyed by a stable string (`circuit`, `beam-schema`),
+never the model's class name, so a pack, a price table or an operator screen can refer to a kind
+across a class rename.
+
+{/* registry-facts:start — generated from the #[IsRegistry] declaration by `splicewire:beam:docs:registries:scaffold`. Rerun the command; do not edit between these markers. */}
+
+- **Root:** `beam.sync.scaffold-pack.content-kinds`
+- **Entries:** `Splicewire\Sync\ScaffoldPack\ContentKindRegistration`
+- **Duplicate keys:** Supersede — a later registration under a taken key replaces the earlier entry, in its place
+- **Population:** Optional — an empty registry is normal
+- **Order:** `70` (display order, ascending)
+- **Declared by:** `Splicewire\Sync\ScaffoldPack\ScaffoldPackContentRegistry`
+
+{/* registry-facts:end */}
+
+## How content reaches a tenant
+
+Each registration declares a `FederationKind`:
+
+- **copy**: cloned into the target tenant's own tables when the pack is applied. The tenant owns the
+  copy and can edit it freely.
+- **pointer**: resolved live from the source by reference and never duplicated, for a living corpus
+  a tenant must not fork.
+- **shadow**: resolved by reference like a pointer, with a local cache for fast or offline reads. The
+  cache can always be rebuilt and is never the record of truth.
+
+Only **copy** kinds are cloned wholesale, through `copyable()`. Registering a kind as a pointer is
+what keeps it out of the copy, rather than a hard-coded exclusion somewhere else.
+
+## Registering a kind
+
+This package declares the registry but ships no service provider and no entries. The tenancy host
+binds it as a singleton and fills it. Tower registers thirteen kinds, for example:
+
+```php
+use Splicewire\Sync\ScaffoldPack\FederationKind;
+use Splicewire\Sync\ScaffoldPack\ScaffoldPackContentRegistry;
+
+$registry = new ScaffoldPackContentRegistry;
+
+$registry->register('circuit', Circuit::class, FederationKind::Copy);
+$registry->register('fragment', Fragment::class, FederationKind::Pointer);
+$registry->register(
+    'beam-schema',
+    ContentBeamSchema::class,
+    FederationKind::Copy,
+    fn () => ContentBeamSchema::query()->contentSchemas()->pluck('id')->map(fn ($id) => (string) $id)->all(),
+);
+```
+
+The fourth argument is an optional id resolver that narrows which rows the kind covers; without one,
+every row of the model is in scope. It runs inside whatever tenant or feed context the reader is
+already in, and the registry itself does no I/O. A fifth argument, `pricing`, is optional and shows
+up in `describe()` as whether the kind is priced.
+
+## Who reads it
+
+Tower's Scaffold Pack applier builds a pack's wholesale-copy scope by walking `copyable()` in
+registration order and resolving each kind's ids. `describe()` gives an operator-facing summary of
+every kind: its key, model, federation kind and whether it is priced. `get()` on an unknown key
+throws with the registry and key in the message.
+
+## Overriding a kind
+
+The duplicate policy is **supersede**: registering a key again replaces its registration.
+
+## Going deeper
+
+The source is
+[`ScaffoldPackContentRegistry`](https://github.com/splicewire/laravel-beam-sync/blob/main/src/ScaffoldPack/ScaffoldPackContentRegistry.php),
+and the federation kinds are
+[`FederationKind`](https://github.com/splicewire/laravel-beam-sync/blob/main/src/ScaffoldPack/FederationKind.php).
