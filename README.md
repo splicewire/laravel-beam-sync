@@ -14,6 +14,16 @@ boundaries — tenant schema → tenant schema, or a remote feed → a local sto
   from the API/UI DTO — see apocryphon `sync-payload-is-a-distinct-projection-from-the-api-dto`).
 - `Splicewire\Sync\Graph\DependencyResolver` — tenancy-free scope-expand + Kahn topo-sort.
 
+## Registries
+
+This package declares one registry:
+
+- [`beam.sync.scaffold-pack.content-kinds`](docs/registries/beam.sync.scaffold-pack.content-kinds.mdx): the
+  kinds of content a Scaffold Pack can deliver to a new tenant, and whether each is copied or referenced.
+
+It ships no service provider and registers into no other package's registry. The host that applies Scaffold
+Packs binds the registry and fills it.
+
 ## Tier
 
 A **foundation** sibling of `laravel-beam`, on the same rung as `rushing/laravel-versioning` and
