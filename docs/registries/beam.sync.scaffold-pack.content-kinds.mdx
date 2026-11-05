@@ -44,7 +44,8 @@ what keeps it out of the copy, rather than a hard-coded exclusion somewhere else
 ## Registering a kind
 
 This package declares the registry but ships no service provider and no entries. The tenancy host
-binds it as a singleton and fills it. Tower registers thirteen kinds, for example:
+binds it as a singleton and fills it. [Splicewire](https://splicewire.test/) registers thirteen
+kinds, for example:
 
 ```php
 use Splicewire\Sync\ScaffoldPack\FederationKind;
@@ -69,14 +70,15 @@ up in `describe()` as whether the kind is priced.
 
 ## Who reads it
 
-Tower's Scaffold Pack applier builds a pack's wholesale-copy scope by walking `copyable()` in
+Splicewire's Scaffold Pack applier builds a pack's wholesale-copy scope by walking `copyable()` in
 registration order and resolving each kind's ids. `describe()` gives an operator-facing summary of
 every kind: its key, model, federation kind and whether it is priced. `get()` on an unknown key
 throws with the registry and key in the message.
 
 ## Overriding a kind
 
-The duplicate policy is **supersede**: registering a key again replaces its registration.
+The [**duplicate-key policy**](/beam/docs/foundations/registries#key-policies) is
+**supersede**: registering a key again replaces its registration.
 
 ## Going deeper
 
