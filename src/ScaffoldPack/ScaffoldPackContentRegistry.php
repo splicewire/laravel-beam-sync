@@ -84,6 +84,8 @@ class ScaffoldPackContentRegistry implements Gated, Registry
      * @param  class-string|ContentKindRegistration|mixed  $entry  the model class (domain form)
      * @param  (Closure(): list<string>)|string|null  $ability  the id resolver (domain form)
      * @param  array<string, mixed>|null  $pricing
+     * @param  string|null  $resource  the particle resource the kind is browsed through (domain form only;
+     *                                 {@see ContentKindRegistration::$resource})
      */
     public function register(
         RegistryKey|string|ContentKindRegistration $key,
@@ -91,6 +93,7 @@ class ScaffoldPackContentRegistry implements Gated, Registry
         FederationKind|string|null $by = null,
         Closure|string|null $ability = null,
         ?array $pricing = null,
+        ?string $resource = null,
     ): static {
         if ($key instanceof ContentKindRegistration) {
             $entry = $key;
@@ -104,6 +107,7 @@ class ScaffoldPackContentRegistry implements Gated, Registry
                 $by,
                 $ability instanceof Closure ? $ability : null,
                 $pricing,
+                $resource,
             );
             $by = null;
             $ability = null;
@@ -171,7 +175,7 @@ class ScaffoldPackContentRegistry implements Gated, Registry
         );
     }
 
-    /** @return list<array{key: string, model: class-string, federation_kind: string, priced: bool}> */
+    /** @return list<array{key: string, model: class-string, federation_kind: string, priced: bool, resource: string|null}> */
     public function describe(): array
     {
         return array_values(array_map(

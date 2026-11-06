@@ -55,8 +55,8 @@ it('describes every registration for the manifest command', function () {
     $registry->register('fragment', FakeBook::class, FederationKind::Pointer);
 
     expect($registry->describe())->toBe([
-        ['key' => 'author', 'model' => FakeAuthor::class, 'federation_kind' => 'copy', 'priced' => false],
-        ['key' => 'fragment', 'model' => FakeBook::class, 'federation_kind' => 'pointer', 'priced' => false],
+        ['key' => 'author', 'model' => FakeAuthor::class, 'federation_kind' => 'copy', 'priced' => false, 'resource' => null],
+        ['key' => 'fragment', 'model' => FakeBook::class, 'federation_kind' => 'pointer', 'priced' => false, 'resource' => null],
     ]);
 });
 
@@ -115,4 +115,31 @@ it('keeps RunAll registration order, and a re-registration supersedes IN PLACE',
     expect($registry->kinds())->toBe(['author', 'book'])
         ->and($registry->get('author')->modelClass)->toBe(FakeBook::class)
         ->and(array_column($registry->describe(), 'key'))->toBe(['author', 'book']);
+});
+
+// ── owner-review-20261102 O10: the `resource` slot ───────────────────────────────────────────
+
+it('carries the particle resource a content-kind is browsed through, on both registration doors', function () {
+    // "Save this workspace as a pack" lists a kind's records in the SOURCE tenant through the resource that
+    // backs it. The key and the resource are different vocabularies (`entity` is browsed as `declarations`),
+    // and a kind with no resource of its own travels all-or-none with another kind, so null is an answer.
+    $registry = new ScaffoldPackContentRegistry;
+    $registry->register('author', FakeAuthor::class, FederationKind::Copy, resource: 'writers');
+    $registry->register('book', FakeBook::class, FederationKind::Copy);
+    $registry->register(new ContentKindRegistration('shelf', FakeBook::class, FederationKind::Copy, resource: 'shelves'));
+
+    expect($registry->get('author')->resource)->toBe('writers')
+        ->and($registry->get('book')->resource)->toBeNull()
+        ->and($registry->get('shelf')->resource)->toBe('shelves')
+        ->and(array_column($registry->describe(), 'resource', 'key'))
+        ->toBe(['author' => 'writers', 'book' => null, 'shelf' => 'shelves']);
+});
+
+it('keeps the id resolver and pricing slots where they were when a resource is named', function () {
+    $registry = new ScaffoldPackContentRegistry;
+    $registry->register('author', FakeAuthor::class, FederationKind::Copy, fn () => ['a1'], ['amount' => 5], 'writers');
+
+    expect($registry->get('author')->resolveIds())->toBe(['a1'])
+        ->and($registry->get('author')->pricing)->toBe(['amount' => 5])
+        ->and($registry->get('author')->resource)->toBe('writers');
 });
