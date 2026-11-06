@@ -66,13 +66,15 @@ $registry->register(
 The fourth argument is an optional id resolver that narrows which rows the kind covers; without one,
 every row of the model is in scope. It runs inside whatever tenant or feed context the reader is
 already in, and the registry itself does no I/O. A fifth argument, `pricing`, is optional and shows
-up in `describe()` as whether the kind is priced.
+up in `describe()` as whether the kind is priced. A sixth, `resource`, names the particle resource the
+kind's rows are browsed through when an operator saves a workspace as a pack and picks Some of a kind;
+leave it null for a kind that travels all-or-none with another one.
 
 ## Who reads it
 
 Splicewire's Scaffold Pack applier builds a pack's wholesale-copy scope by walking `copyable()` in
 registration order and resolving each kind's ids. `describe()` gives an operator-facing summary of
-every kind: its key, model, federation kind and whether it is priced. `get()` on an unknown key
+every kind: its key, model, federation kind, whether it is priced, and its resource. `get()` on an unknown key
 throws with the registry and key in the message.
 
 ## Overriding a kind
